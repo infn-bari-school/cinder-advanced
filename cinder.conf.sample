@@ -1,0 +1,80 @@
+[DEFAULT]
+rootwrap_config = /etc/cinder/rootwrap.conf
+api_paste_confg = /etc/cinder/api-paste.ini
+iscsi_helper = tgtadm
+volume_name_template = volume-%s
+#volume_group = cinder-volumes-1
+verbose = True
+auth_strategy = keystone
+state_path = /var/lib/cinder
+lock_path = /var/lock/cinder
+volumes_dir = /var/lib/cinder/volumes
+
+#debug=True
+
+rabbit_host = havana-controller
+
+notification_driver = cinder.openstack.common.notifier.rabbit_notifier
+control_exchange = cinder
+notification_driver = cinder.openstack.common.notifier.rpc_notifier
+rpc_backend = cinder.openstack.common.rpc.impl_kombu
+
+scheduler_driver=cinder.scheduler.filter_scheduler.FilterScheduler
+
+
+# Driver to use for backups. (string value)
+backup_driver=cinder.backup.drivers.swift
+
+#
+# Options defined in cinder.backup.drivers.swift
+#
+
+# The URL of the Swift endpoint (string value)
+backup_swift_url=http://<swift-proxy>:8080/v1/AUTH_
+
+# Swift authentication mechanism (string value)
+backup_swift_auth=per_user
+
+# Swift user name (string value)
+#backup_swift_user=<None>
+
+# Swift key for authentication (string value)
+#backup_swift_key=<None>
+
+# The default Swift container to use (string value)
+backup_swift_container=volumebackups
+
+# The size in bytes of Swift backup objects (integer value)
+#backup_swift_object_size=52428800
+
+# The number of retries to make for Swift operations (integer
+# value)
+#backup_swift_retry_attempts=3
+
+# The backoff time in seconds between Swift retries (integer
+# value)
+#backup_swift_retry_backoff=2
+
+# Compression algorithm (None to disable) (string value)
+#backup_compression_algorithm=zlib
+
+
+enabled_backends=lvmdriver-1, ceph-1
+[lvmdriver-1]
+volume_group=cinder-volumes-1
+volume_driver=cinder.volume.drivers.lvm.LVMISCSIDriver
+volume_backend_name=LVM_DATA
+
+[ceph-1]
+volume_driver=cinder.volume.drivers.rbd.RBDDriver
+volume_backend_name=CEPH_DATA
+rbd_pool=volumes
+rbd_ceph_conf=/etc/ceph/ceph.conf
+rbd_flatten_volume_from_snapshot=false
+rbd_max_clone_depth=5
+rbd_user=cinder
+rbd_secret_uuid=1bed062b-7b40-4f63-a433-9080ceef83de
+glance_api_version=2
+
+[database]
+connection = mysql://cinder:password@localhost/cinder
